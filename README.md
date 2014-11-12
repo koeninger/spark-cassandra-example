@@ -14,7 +14,7 @@ sbt assembly
 
 To run:
 
-/your/path/to/spark/bin/spark-submit --properties-file cassandra-example.conf --class org.koeninger.CassandraExample target/scala-2.10/cassandra-example-assembly-0.1-SNAPSHOT.jar
+/your/path/to/spark/bin/spark-submit --properties-file cassandra-example.conf --class org.koeninger.HelloWorldExample target/scala-2.10/cassandra-example-assembly-0.1-SNAPSHOT.jar
 
 
 To add jar to the spark shell classpath so you can play with cassandra:
@@ -28,6 +28,8 @@ sbt test
 
 
 For more info:
+
+Presentation slides for this project, at http://koeninger.github.io/spark-cassandra-example/
 
 http://spark.apache.org/docs/latest/submitting-applications.html
 

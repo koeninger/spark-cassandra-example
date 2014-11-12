@@ -8,7 +8,7 @@ import scala.util.Random
 /** Insert some highly realistic sample data into cassandra.
   * Assumes test.user_visits and test.stores tables already exist, see cassandra-example.cql
   */
-object InsertExample extends App {
+object InsertExample {
   def randomStores(sc: SparkContext, stores: Int, cities: Int): RDD[(String, String, String)] = {
     sc.parallelize(0 until stores).map { s =>
       val city = s"city_${Random.nextInt(cities)}"
@@ -35,17 +35,19 @@ object InsertExample extends App {
     }
   }
 
-  val conf = new SparkConf().setAppName("cassandra-example-insert")
+  def main(args: Array[String]): Unit = {
+    val conf = new SparkConf().setAppName("cassandra-example-insert")
 
-  val sc = new SparkContext(conf)
-  
-  val numStores = 128
+    val sc = new SparkContext(conf)
+    
+    val numStores = 128
 
-  randomStores(sc, stores = numStores, cities = 32).
-    saveToCassandra("test", "stores", SomeColumns("city", "store", "manager"))
+    randomStores(sc, stores = numStores, cities = 32).
+      saveToCassandra("test", "stores", SomeColumns("city", "store", "manager"))
 
-  randomVisits(sc, users = 16384, visitsPerUser = 128, stores = numStores).
-    saveToCassandra("test", "user_visits", SomeColumns("user", "utc_millis", "store"))
+    randomVisits(sc, users = 16384, visitsPerUser = 128, stores = numStores).
+      saveToCassandra("test", "user_visits", SomeColumns("user", "utc_millis", "store"))
 
-  sc.stop
+    sc.stop
+  }
 }
