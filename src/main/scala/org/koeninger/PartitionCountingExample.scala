@@ -7,20 +7,18 @@ import com.datastax.spark.connector._
 
 /** Because the cassandra driver will return all cells for a given rowkey in the same partition,
     aggregating using mapPartitions can be more efficient */
-object PartitionGroupingExample {
+object PartitionCountingExample {
   def main(args: Array[String]): Unit = {
-    val conf = new SparkConf().setAppName("cassandra-example-partition-grouping")
+    val conf = new SparkConf().setAppName("cassandra-example-partition-counting")
 
     val sc = new SparkContext(conf)
     
     val visits = sc.cassandraTable[(String)]("test", "user_visits").
       select("user")
 
-    val visitsPerUser = visits.map { user =>
-      (user, 1)
-    }.mapPartitions { userIterator =>
-      new GroupByKeyIterator(userIterator)
-    }.mapValues(_.size)
+    val visitsPerUser = visits.mapPartitions { userIterator =>
+      new CountingIterator(userIterator)
+    }
 
     val maxVisits = visitsPerUser.values.max
 
