@@ -102,7 +102,8 @@ sbt test
 
 ## Cassandra
 
-* version 2.0.x
+* version 2.0.x, will probably work with 2.1.x as well
+* Don't use 2.0.5 through 2.0.9 (see [CASSANDRA-7535](https://issues.apache.org/jira/browse/CASSANDRA-7535))
 * follow the datastax [install recommendations](http://www.datastax.com/documentation/cassandra/2.0/cassandra/install/installRecommendSettings.html)
 * if co-locating spark and cassandra on same nodes, in cassandra-env.sh set MAX_HEAP_SIZE (more on this later)
 
@@ -343,6 +344,30 @@ someRdd.mapPartitions { part =>
   }
 }
 
+```
+
+---
+## Understand closures (other issues)
+
+If you encounter other closure-related issues, make sure that
+
+* all captured references are serializable
+* all captured references are immutable
+* all captured references are either local vals, or in a static object
+
+As a specific example, don't extend App:
+
+```scala
+object MyApp extends App {
+  // start running
+```
+
+Use an explicit main method instead
+
+```scala
+object MyApp {
+  def main(args: Array[String]) {
+    // start running
 ```
 
 ---
