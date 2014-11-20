@@ -81,7 +81,7 @@ Some Cassandra knowledge => use Spark to solve your problems
 * Download, chmod +x, put it on your path
 * No need to "install" Scala or mess with sbt launch jar
 * If you want an IDE, use IntelliJ with sbt
-* Yes, its another build tool.  It's the best build tool for Scala, and Scala is the best tool for writing Spark jobs.
+* Yes, it's another build tool.  It's the best build tool for Scala, and Scala is the best tool for writing Spark jobs.
 
 ---
 
@@ -102,7 +102,7 @@ sbt test
 
 ## Cassandra
 
-* version 2.0.x, will probably work with 2.1.x as well
+* version 2.0.x, should work with 2.1.x as well
 * Don't use 2.0.5 through 2.0.9 (see [CASSANDRA-7535](https://issues.apache.org/jira/browse/CASSANDRA-7535))
 * follow the datastax [install recommendations](http://www.datastax.com/documentation/cassandra/2.0/cassandra/install/installRecommendSettings.html)
 * if co-locating spark and cassandra on same nodes, in cassandra-env.sh set MAX_HEAP_SIZE (more on this later)
@@ -138,14 +138,23 @@ collect.foreach(println)
 
 ---
 
-## Which nodes to run spark processes on?
+## Which nodes to run Spark processes on?
 
 * driver: one per running job, low resources unless you collect() a bunch of data back to the driver
 * master: one per cluster, low resources
 * worker: many per cluster, usually max 1 per node, low resources
 * executor: spawned by worker on same node, high resources
 
-In short, it doesn't matter where you put driver and master.  Can be on worker nodes, or their own small node.
+In short, as long as everything's on the same network, it doesn't matter where you put driver and master.  Can be on some of the worker nodes, or their own small node.
+
+---
+
+## Spark Configuration
+
+* Follow the general [tuning guidelines](http://spark.apache.org/docs/1.1.0/tuning.html)
+* Spark can write a lot of files, make sure ulimit is set high, at least number of map tasks x number of reduce tasks
+* Setting spark.shuffle.consolidateFiles = true or spark.shuffle.manager = SORT can help with the number of files, but test carefully
+* The [hardware guidelines](http://spark.apache.org/docs/1.1.0/hardware-provisioning.html) are aggressive. If your budget doesn't support that start with e.g. several m3.xlarge instances and see if you need more.
 
 ---
 
@@ -153,6 +162,7 @@ In short, it doesn't matter where you put driver and master.  Can be on worker n
 
 * Running spark workers on cassandra nodes will improve i/o performance due to data locality, but they will compete for system resources
 * in spark-env.sh set SPARK_WORKER_MEMORY, in cassandra-env.sh set MAX_HEAP_SIZE, divide ram amongst them
+* Leave enough ram for off-heap cache (if applicable) and os buffers
 * in spark-env.sh set SPARK_WORKER_CORES if you want
 * Cluster scans are rough on cassandra, so limit spark jobs to off-peak hours if you can
 
@@ -275,9 +285,9 @@ If you have trouble finding out where dependencies came from, https://github.com
 # Performance Tips
 
 1. Use the UI
-2. Understand closures
-3. Understand partitions
-4. Understand shuffle
+1. Understand closures
+1. Understand partitions
+1. Understand shuffle
 
 ---
 
@@ -297,6 +307,7 @@ If you have trouble finding out where dependencies came from, https://github.com
 ![](pictures/slow.png)
 
 ---
+Same goal as in previous slide, but much less shuffle, so over twice as fast:
 
 ![](pictures/fast.png)
 
