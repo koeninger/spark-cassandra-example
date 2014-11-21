@@ -165,6 +165,7 @@ In short, as long as everything's on the same network, it doesn't matter where y
 * Leave enough ram for off-heap cache (if applicable) and os buffers
 * in spark-env.sh set SPARK_WORKER_CORES if you want
 * Cluster scans are rough on cassandra, so limit spark jobs to off-peak hours if you can
+* Another option is setting up replication to a separate Cassandra DC for analytics
 
 ---
 
@@ -481,6 +482,8 @@ See JoinExample.scala vs BroadcastJoinExample.scala for details
 # Resources
 
 * [Scala for the Impatient](http://www.horstmann.com/scala/index.html), best book for picking up Scala quickly and accurately. First half is [free online](https://typesafe.com/resources/e-books)
+
+* [Austin Scala Meetup](http://www.meetup.com/Austin-Scala-Enthusiasts/)
 
 * [Learning Spark](http://shop.oreilly.com/product/0636920028512.do), awesome book on Spark by some of the main committers.  In Early Access but already well worth the money
 
